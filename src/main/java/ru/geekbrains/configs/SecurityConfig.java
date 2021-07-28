@@ -1,5 +1,6 @@
 package ru.geekbrains.configs;
 
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +11,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ru.geekbrains.services.UserService;
+
+// Домашнее задание:
+// 1. Заменить безопасность по ролям на безопасность по правам доступа
+// 2. * Сделать как роли, так и права доступа, у каждой роли свой набор прав
+
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -22,10 +28,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         log.info("Dao Authentication Provider");
         http.authorizeRequests()
-                .antMatchers("/auth_page/**").authenticated()
-                .antMatchers("/user_info").authenticated()
-                .antMatchers("/admin/**").hasAnyRole("ADMIN", "SUPERADMIN") // ROLE_ADMIN, ROLE_SUPERADMIN
-                .anyRequest().permitAll()
+                .antMatchers("/index.html").permitAll()
+                .antMatchers("/profile/**").authenticated()
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/management/**").hasAnyRole("ADMIN", "MANAGER")
+                .antMatchers("/api/public/test1").hasAuthority("ACCESS_TEST1")
+                .antMatchers("/api/public/test2").hasAuthority("ACCESS_TEST2")
+                .antMatchers("/api/public/users").hasRole("ADMIN")
                 .and()
                 .formLogin()
                 .and()
